@@ -1,0 +1,136 @@
+---
+title: "Homework 1 -- Maximum Likelihood Estimator"
+subtitle: "STA 211 -- The Mathematics of Regression -- Spring 2022"
+author: "Erik Novak"
+date: "2022 January 25"
+due_date: "25 January, 3:30 pm"
+format: pdf
+editor: visual
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+## Setup
+
+```{r load-pkg-data}
+#| message: false
+library(tidyverse)
+```
+
+## Instructions
+
+This assignment covers methods for maximum likelihood estimation for
+general statistical models. Upload a scanned or word-processed version
+of the assignment to the Assignments folder on Sakai. For problems where
+you are asked to derive or show a result, include all intermediate steps
+in your answer for full credit.
+
+## Problems
+
+1.  Watch the Panopto video on "Properties of Estimator" posted in the
+    Panopto folder on the Sakai site. This video covers Section 7 of the
+    STA 211 Supplement, which you are welcome to read in addition. For
+    those learning maximum likelihood estimation for the first time, or
+    needing a review, read Section 8 of the STA 211 Supplement. For this
+    problem, write a sentence indicating whether or not you viewed the
+    video and what sections of the STA 211 Supplement you read, if any.
+    Watching the video earns 2 points on this assignment.
+
+**I watched the Panopto video, and have read all of the supplement
+sections, the most relevant of which for this homework were certainly
+sections 7 and 8.**
+
+2.  A commonly used probability distribution for monetary random
+    variables is the Pareto distribution. Assume all values of the
+    random variable are greater than or equal to some baseline value
+    $k$, which is fixed and known. The Pareto probability density
+    function is
+
+$$ 
+f(y) = \begin{cases} \theta k^\theta \left(\frac{1}{y}\right)^{\theta + 1} & y \geq k, \, \theta > 0\\
+0 & \textrm{otherwise.} \end{cases} 
+$$
+
+Suppose you have a random sample of $n$ independent measurements. Find
+an expression for the MLE for $\theta$.
+
+Given the assumption that the $n$ measurements are i.i.d, then let
+$f(y_i)$, for $1 \leq i \leq n$, be the probability density function for
+one of the $n$ measurements.
+
+From that, the Likelihood function $L(\theta)$ is defined as the product
+of the probability density functions for each measurement. That is,
+
+$$
+\begin{aligned}
+L(\theta) &= \prod_{i = 1}^n(fy_i)\\
+          &= \prod_{i = 1}^n \theta k^\theta \left(\frac{1}{y_i}\right)^{\theta + 1}\\
+          &= \left(\theta k^\theta\right)^n\prod_{i = 1}^n \frac{1}{y_i^{\theta + 1}}\\
+          &= \theta^n k^{n\theta} \prod_{i = 1}^n y_i^{-(\theta + 1)}
+\end{aligned}
+$$ Now, having the expression for the likelihood function we need to
+find the values for its variables that maximize it. That is, the maximum
+likelihood estimator for $\theta$ will be the value of $\theta$ that
+maximizes $L(\theta)$
+
+To solve this optimization problem, we need only differentiate
+$L(\theta)$ with respect to $\theta$, set it equal to $0$, and solve for
+$\theta$.
+
+However, to differentiate this expression, we notice it is the product
+of $n + 2$ different simpler functions; thus, to find the derivative, we
+are best served by first taking the natural logarithm of the function,
+and thus finding the log-likelihood function:
+
+$$
+\begin{aligned}
+l(\theta) = \ln (L(\theta)) &= \ln \left(\theta^n k^{n\theta} \prod_{i = 1}^n y_i^{-(\theta + 1)}\right)\\
+                &= \ln(\theta^n) + \ln(k^{n\theta}) + \ln\left(\prod_{i = 1}^n y_i^{-(\theta + 1)}\right)\\
+                &= n\ln(\theta) + n\ln(k)\theta + \sum_{i = 1}^n \ln \left( y_i^{-(\theta + 1)}\right)\\
+                &= n\ln(\theta) + n\ln(k)\theta - (\theta + 1)\sum_{i = 1}^n \ln \left( y_i\right)\\
+                &= n\ln(\theta) + n\ln(k)\theta - \theta \sum_{i = 1}^n \ln \left( y_i\right)
+ - \sum_{i = 1}^n \ln \left( y_i\right)
+\end{aligned}
+$$
+
+Note that that our values for $y_i$ remain the same, as the logarithm
+was taken over the function as a whole; so, the window for which the
+distributions is defined as nonzero will stay the same.
+
+Now, the value that maximizes the natural logarithm of a function is the
+same as the value that maximizes the original function, so we need only
+consider the log-likelihood function $l(\theta)$ and differentiate it
+with respect to $\theta$, and finally find the value of $\theta$ for
+which the derivative gives $0$. That value will be the same for
+$L(\theta)$ too.
+
+So, we differentiate:
+
+$$
+\begin{aligned}
+    \frac{d}{d\theta}l(\theta) &= \frac{d}{d\theta} \left(n\ln(\theta) + n\ln(k)\theta - \theta \sum_{i = 1}^n \ln \left( y_i\right)
+ - \sum_{i = 1}^n \ln \left( y_i\right) \right)\\
+                          &= \frac{d}{d\theta} (n\ln(\theta)) + 
+\frac{d}{d\theta} (n\ln(k)\theta) - \frac{d}{d\theta} \left(\theta \sum_{i = 1}^n \ln \left( y_i\right)\right) - \frac{d}{d\theta}\left(
+\sum_{i = 1}^n \ln \left( y_i\right)\right)\\
+                          &= \frac{n}{\theta} + n\ln(k) - \sum_{i = 1}^n \ln \left( y_i\right)
+\end{aligned}
+$$
+
+Now, we set the derivative of $l(\theta)$ equal to $0$, and find the values
+of $\theta$ that ensure that result; those will be our MLE
+values.
+
+3.  Suppose that in a company all individuals earn at least
+    $k = \$20, 000$ per year. Suppose you have $n = 5$ individuals'
+    salaries, $y_1 = \$110,501$, $y_2 = \$45,662$, $y_3 = \$89,680$,
+    $y_4 = \$1,658,909$, and $y_5 = \$20,218$. (Professor Reiter drew
+    these randomly from a Pareto distribution using R.) Find the MLE of
+    $\theta$.
+
+4.  Using the data from Problem $3$ and the model from Problem $2$, use
+    R to plot the likelihood function over the range
+    $\theta < \theta < 1$ using step sizes of $0.01$. Turn in the plot
+    and code. Label the maximum likelihood estimate on the plot, and
+    confirm that it approximately matches your answer in Problem 3.
